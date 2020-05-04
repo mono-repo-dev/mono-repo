@@ -1,0 +1,23 @@
+{
+  "name": "@mono-repo/utils",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "dist/main.cjs.js",
+  "module": "dist/main.esm.js",
+  "types": "dist/main.d.ts",
+  "sideEffects": false,
+  "scripts": {
+    "build": "ts-engine build --library",
+    "lint": "ts-engine lint",
+    "test": "ts-engine test",
+    "typecheck": "ts-engine typecheck --emit"
+  },
+  "devDependencies": {
+    "@ts-engine/cli": "^1.4.0",
+    "mock-fs": "^4.12.0"
+  },
+  "dependencies": {
+    "fs-extra": "^9.0.0",
+    "glob-promise": "^3.4.0"
+  }
+}
