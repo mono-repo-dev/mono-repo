@@ -7,13 +7,13 @@ describe("findPackages", () => {
     mockFs.restore();
   });
 
-  it("should find all packages in the mono repo", async () => {
+  it("should find all packages in the mono repo without duplicates", async () => {
     const pkgA = { name: "a", version: "1.0.0", scripts: { start: "node" } };
     const pkgB = { name: "b", version: "2.1.0", dependencies: { abc: "16" } };
     const pkgC = { name: "c", version: "1.2.3", description: "hello world" };
     const monoRepoPkg = {
       private: true,
-      workspaces: ["packages/**", "some/deeper/alt-packages/*"],
+      workspaces: ["packages/**", "packages/*", "some/deeper/alt-packages/*"],
     };
 
     mockFs({

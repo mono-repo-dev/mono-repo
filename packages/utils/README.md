@@ -34,7 +34,7 @@ console.log(packages);
  * [
  *   {
  *     dir: "/absolute/path/to/package/a",
- *     packageJson: {
+ *     json: {
  *       name: "a",
  *       version: "1.0.0",
  *       license: "MIT",
@@ -46,7 +46,7 @@ console.log(packages);
  *   },
  *   {
  *     dir: "/absolute/path/to/package/b",
- *     packageJson: {
+ *     json: {
  *       name: "b",
  *       version: "1.0.0",
  *       license: "MIT",

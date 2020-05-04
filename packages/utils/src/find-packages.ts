@@ -14,9 +14,12 @@ export const findPackages = async (
   // Find all paths to package.jsons via globs
   const globResults = await Promise.all(packageJsonGlobs.map((g) => glob(g)));
 
-  // Need to flatten glob results into a simple array of filepaths
+  // Need to flatten glob results into a simple array of filepaths and remove duplicates
   const packageJsonFilepaths = globResults
-    .reduce((acc, next) => [...acc, ...next], [])
+    .reduce(
+      (acc, next) => [...acc, ...next.filter((x) => !acc.includes(x))],
+      []
+    )
     .filter((x) => !x.includes("node_modules"));
 
   // Load all file contents into a JS object, it's JSON so serializes properly
