@@ -4,7 +4,7 @@ import glob from "glob-promise";
 import { MonoRepo, MonoRepoPackage, Package } from "./types";
 
 export interface FindPackagesOptions {
-  order?: "alphabetical" | "dependency";
+  order?: "alphabetical" | "dependency-graph";
 }
 
 // Walks the dependency tree and returns packages in dependency order
@@ -145,7 +145,7 @@ export const findPackages = async (
 
   // Return packages sorted appropriately
   switch (options.order) {
-    case "dependency": {
+    case "dependency-graph": {
       return await orderByDependencyTree(packages);
     }
     case "alphabetical":

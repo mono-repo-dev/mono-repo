@@ -39,7 +39,7 @@ describe("findPackages", () => {
     ]);
   });
 
-  it("should find all packages in the mono repo without duplicates (dependency order)", async () => {
+  it("should find all packages in the mono repo without duplicates (dependency-graph order)", async () => {
     const pkgA = {
       name: "a",
       version: "1.0.0",
@@ -74,7 +74,7 @@ describe("findPackages", () => {
     });
 
     expect(
-      await findPackages(await findMonoRepo(), { order: "dependency" })
+      await findPackages(await findMonoRepo(), { order: "dependency-graph" })
     ).toEqual([
       {
         dir: "/packages/e",
@@ -119,7 +119,7 @@ describe("findPackages", () => {
 
     await expect(
       async () =>
-        await findPackages(await findMonoRepo(), { order: "dependency" })
+        await findPackages(await findMonoRepo(), { order: "dependency-graph" })
     ).rejects.toThrowError("Circular dependency between packages 'a' and 'b'");
   });
 
@@ -137,7 +137,7 @@ describe("findPackages", () => {
 
     await expect(
       async () =>
-        await findPackages(await findMonoRepo(), { order: "dependency" })
+        await findPackages(await findMonoRepo(), { order: "dependency-graph" })
     ).rejects.toThrowError("Circular dependency between packages 'a' and 'a'");
   });
 });
