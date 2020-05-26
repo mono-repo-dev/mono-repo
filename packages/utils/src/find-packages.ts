@@ -7,63 +7,107 @@ export interface FindPackagesOptions {
   order?: "alphabetical" | "dependency";
 }
 
-const getOrderedDependencyPackages = (
-  pkg: MonoRepoPackage,
-  packages: MonoRepoPackage[],
+// Walks the dependency tree and returns packages in dependency order
+const getFlatPackageDependencies = (
+  currentPackage: MonoRepoPackage,
+  monoRepoPackages: MonoRepoPackage[],
   resolvedPackages: MonoRepoPackage[] = [],
   seenPackages: MonoRepoPackage[] = []
 ): MonoRepoPackage[] => {
-  const localDependencyPackages = Object.keys(pkg.json?.dependencies)
-    .filter((dep) => packages.some((p) => p.json.name == dep))
-    .map((name) => packages.find((p) => p.json.name === name));
+  // Determine all the local packages that the current package depends on,
+  // need to walk each of these all the way down the dependency tree
+  const localPackages = Object.keys(currentPackage.json?.dependencies)
+    .filter((name) => monoRepoPackages.some((p) => p.json.name == name))
+    .map((name) => monoRepoPackages.find((p) => p.json.name === name));
 
-  const seenPkgs = [...seenPackages];
-  let depPkgs = [...resolvedPackages];
-  for (let localDependencyPackage of localDependencyPackages) {
-    const seen = seenPkgs.find(
-      (d) => d.json.name === localDependencyPackage.json.name
+  // Make copies of passed in arguments we need to manipulate
+  const seenLocalPackages = [...seenPackages];
+  const resolvedLocalPackages = [...resolvedPackages];
+
+  for (let localPackage of localPackages) {
+    // Check if the package has already been seen during this branch
+    // of the dependency tree, if it has then there is a circular dependency
+    const seenPackage = seenLocalPackages.find(
+      (d) => d.json.name === localPackage.json.name
     );
-    if (seen) {
+
+    if (seenPackage) {
       throw new Error(
-        `Circular dependency between packages '${seen.json.name}' and '${pkg.json.name}'`
+        `Circular dependency between packages '${seenPackage.json.name}' and '${currentPackage.json.name}'`
       );
     }
-    seenPkgs.push(pkg);
-    const newDeps = getOrderedDependencyPackages(
-      localDependencyPackage,
-      packages,
-      depPkgs,
-      seenPkgs
+
+    // Mark the current package as now seen
+    seenLocalPackages.push(currentPackage);
+
+    // Complete walking the tree for this package dependency recursively
+    const nestedLocalPackages = getFlatPackageDependencies(
+      localPackage,
+      monoRepoPackages,
+      resolvedLocalPackages,
+      seenLocalPackages
     );
-    for (let newDep of newDeps) {
-      const exists = depPkgs.find((d) => d.json.name === newDep.json.name);
-      if (exists) {
-        depPkgs = depPkgs.splice(depPkgs.indexOf(exists));
-      }
-      const seen = seenPkgs.find((d) => d.json.name === newDep.json.name);
-      if (seen) {
-        throw new Error(
-          `Ciruclar dependency between packages '${seen.json.name}' and '${newDep.json.name}'`
-        );
+
+    // Add each nested package found to the resolved list
+    for (let nestedLocalPackage of nestedLocalPackages) {
+      // If it already exists in the resolved list then need to remove the first
+      // entry and add it again so its in a more correct location
+      const existingIndex = resolvedLocalPackages.indexOf(nestedLocalPackage);
+      if (existingIndex !== -1) {
+        resolvedLocalPackages.slice(existingIndex);
       }
 
-      depPkgs.push(newDep);
+      resolvedLocalPackages.push(nestedLocalPackage);
     }
   }
 
-  const exists = depPkgs.find((d) => d.json.name === pkg.json.name);
-  if (exists) {
-    depPkgs = depPkgs.splice(depPkgs.indexOf(exists));
+  // If the current package already exists in the resolved list then need to
+  // remove the first entry and add it again so its in a more correct location
+  const existingIndex = resolvedLocalPackages.indexOf(currentPackage);
+  if (existingIndex !== -1) {
+    resolvedLocalPackages.slice(existingIndex);
   }
-  depPkgs.push(pkg);
-  const returnPackages = [];
 
-  for (let depPkg of depPkgs) {
-    if (!resolvedPackages.includes(depPkg)) {
-      returnPackages.push(depPkg);
-    }
+  // Add the current package to the resolved list
+  resolvedLocalPackages.push(currentPackage);
+
+  // Return list of packages removing duplicates
+  return resolvedLocalPackages.reduce((acc, next) => {
+    return acc.includes(next) ? [...acc] : [...acc, next];
+  }, []);
+};
+
+// Sort packages by their dependency tree
+const orderByDependencyTree = async (
+  packages: MonoRepoPackage[]
+): Promise<MonoRepoPackage[]> => {
+  // Need to construct a root package that depends on
+  // all packages to act as the root of the tree
+  const rootPackage: MonoRepoPackage = {
+    dir: "",
+    json: {
+      name: "",
+      version: "1.0.0",
+      dependencies: {},
+    },
+  };
+  for (let pkg of packages) {
+    rootPackage.json.dependencies[pkg.json.name] = pkg.json.version;
   }
-  return returnPackages;
+
+  // Walk the dependency tree and then remove the root package as it doesn't really exist
+  return getFlatPackageDependencies(rootPackage, packages).filter(
+    (p) => p !== rootPackage
+  );
+};
+
+// Sort packages alphabetically by name
+const orderAlphabetically = async (
+  packages: MonoRepoPackage[]
+): Promise<MonoRepoPackage[]> => {
+  return packages.sort((a, b) =>
+    a.json.name.toLowerCase().localeCompare(b.json.name.toLowerCase())
+  );
 };
 
 export const findPackages = async (
@@ -99,32 +143,14 @@ export const findPackages = async (
     })
   );
 
+  // Return packages sorted appropriately
   switch (options.order) {
     case "dependency": {
-      const rootDependencies = {};
-      for (let pkg of packages) {
-        rootDependencies[pkg.json.name] = pkg.json.version;
-      }
-
-      const rootPackage: MonoRepoPackage = {
-        dir: "",
-        json: {
-          name: "",
-          version: "1.0.0",
-          dependencies: rootDependencies,
-        },
-      };
-      const orderedPackages = getOrderedDependencyPackages(
-        rootPackage,
-        packages
-      );
-      return orderedPackages.filter((p) => p !== rootPackage);
+      return await orderByDependencyTree(packages);
     }
     case "alphabetical":
     default: {
-      return packages.sort((a, b) =>
-        a.json.name.toLowerCase().localeCompare(b.json.name.toLowerCase())
-      );
+      return await orderAlphabetically(packages);
     }
   }
 };
