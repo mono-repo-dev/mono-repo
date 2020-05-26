@@ -8,13 +8,13 @@ export interface FindMonoRepoOptions {
 
 const tryExtractPackageGlobs = async (
   pkg: Package
-): Promise<string[] | null> => {
+): Promise<string[] | undefined> => {
   const isPrivate = pkg.private === true;
   const hasYarnWorkspacesKey = "workspaces" in pkg;
 
   // Early exit if the config isn't there
   if (!isPrivate || !hasYarnWorkspacesKey) {
-    return null;
+    return undefined;
   }
 
   return Array.isArray(pkg.workspaces)

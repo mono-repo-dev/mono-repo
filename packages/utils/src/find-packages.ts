@@ -16,9 +16,9 @@ const getFlatPackageDependencies = (
 ): MonoRepoPackage[] => {
   // Determine all the local packages that the current package depends on,
   // need to walk each of these all the way down the dependency tree
-  const localPackages = Object.keys(currentPackage.json?.dependencies)
+  const localPackages = Object.keys(currentPackage.json?.dependencies ?? {})
     .filter((name) => monoRepoPackages.some((p) => p.json.name == name))
-    .map((name) => monoRepoPackages.find((p) => p.json.name === name));
+    .map((name) => monoRepoPackages.find((p) => p.json.name === name)!);
 
   // Make copies of passed in arguments we need to manipulate
   const seenLocalPackages = [...seenPackages];
@@ -72,7 +72,7 @@ const getFlatPackageDependencies = (
   resolvedLocalPackages.push(currentPackage);
 
   // Return list of packages removing duplicates
-  return resolvedLocalPackages.reduce((acc, next) => {
+  return resolvedLocalPackages.reduce<MonoRepoPackage[]>((acc, next) => {
     return acc.includes(next) ? [...acc] : [...acc, next];
   }, []);
 };
@@ -88,12 +88,12 @@ const orderByDependencyTree = async (
     json: {
       name: "",
       version: "1.0.0",
-      dependencies: {},
+      dependencies: packages.reduce(
+        (acc, next) => ({ ...acc, [next.json.name]: next.json.version }),
+        {}
+      ),
     },
   };
-  for (let pkg of packages) {
-    rootPackage.json.dependencies[pkg.json.name] = pkg.json.version;
-  }
 
   // Walk the dependency tree and then remove the root package as it doesn't really exist
   return getFlatPackageDependencies(rootPackage, packages).filter(
