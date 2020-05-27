@@ -103,6 +103,81 @@ describe("findPackages", () => {
     ]);
   });
 
+  it("should find all packages for a given scope (dependency-graph order)", async () => {
+    const pkgA = { name: "a", version: "1.0.0", dependencies: { b: "1.0.0" } };
+    const pkgB = { name: "b", version: "1.0.0", dependencies: { d: "1.0.0" } };
+    const pkgC = { name: "c", version: "1.0.0", dependencies: { a: "1.0.0" } };
+    const pkgD = { name: "d", version: "1.0.0" };
+    const monoRepoPkg = {
+      private: true,
+      workspaces: ["packages/**", "packages/*", "some/deeper/alt-packages/*"],
+    };
+
+    mockFs({
+      "/package.json": JSON.stringify(monoRepoPkg),
+      "/packages/a/package.json": JSON.stringify(pkgA),
+      "/packages/b/package.json": JSON.stringify(pkgB),
+      "/packages/c/package.json": JSON.stringify(pkgC),
+      "/packages/d/package.json": JSON.stringify(pkgD),
+    });
+
+    const monoRepo = await findMonoRepo();
+    const packages = await findPackages(monoRepo);
+
+    expect(
+      await findPackages(monoRepo, {
+        scope: packages[0],
+        order: "dependency-graph",
+      })
+    ).toEqual([
+      {
+        dir: "/packages/d",
+        json: pkgD,
+      },
+      {
+        dir: "/packages/b",
+        json: pkgB,
+      },
+    ]);
+  });
+
+  it("should find all packages for a given scope (alphabetical order)", async () => {
+    const pkgA = { name: "a", version: "1.0.0", dependencies: { d: "1.0.0" } };
+    const pkgB = { name: "b", version: "1.0.0" };
+    const pkgC = { name: "c", version: "1.0.0", dependencies: { a: "1.0.0" } };
+    const pkgD = { name: "d", version: "1.0.0", dependencies: { b: "1.0.0" } };
+    const monoRepoPkg = {
+      private: true,
+      workspaces: ["packages/**", "packages/*", "some/deeper/alt-packages/*"],
+    };
+
+    mockFs({
+      "/package.json": JSON.stringify(monoRepoPkg),
+      "/packages/a/package.json": JSON.stringify(pkgA),
+      "/packages/b/package.json": JSON.stringify(pkgB),
+      "/packages/c/package.json": JSON.stringify(pkgC),
+      "/packages/d/package.json": JSON.stringify(pkgD),
+    });
+
+    const monoRepo = await findMonoRepo();
+    const packages = await findPackages(monoRepo);
+
+    expect(
+      await findPackages(monoRepo, {
+        scope: packages[0],
+      })
+    ).toEqual([
+      {
+        dir: "/packages/b",
+        json: pkgB,
+      },
+      {
+        dir: "/packages/d",
+        json: pkgD,
+      },
+    ]);
+  });
+
   it("should throw when there is a circular dependency (a -> b, b -> a)", async () => {
     const pkgA = { name: "a", version: "1.0.0", dependencies: { b: "1.0.0" } };
     const pkgB = { name: "b", version: "1.0.0", dependencies: { a: "1.0.0" } };

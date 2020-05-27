@@ -46,7 +46,7 @@ console.log(monoRepo);
  */
 ```
 
-### `findPackages(monoRepo, { order: "alphabetical" | "dependency-graph" })`
+### `findPackages(monoRepo, { order: "alphabetical" | "dependency-graph", scope: package | undefined })`
 
 Find packages within a mono repo.
 
@@ -97,6 +97,93 @@ const monoRepo = await findMonoRepo();
 const packages = await findPackages(monoRepo, { order: "dependency-graph" });
 
 console.log(packages);
+
+/**
+ * [
+ *   {
+ *     dir: "/absolute/path/to/package/b",
+ *     json: {
+ *       name: "b",
+ *       version: "1.0.0",
+ *       license: "MIT",
+ *       public: true,
+ *       ...
+ *     }
+ *   },
+ *   {
+ *     dir: "/absolute/path/to/package/a",
+ *     json: {
+ *       name: "a",
+ *       version: "1.0.0",
+ *       license: "MIT",
+ *       public: true,
+ *       dependencies: {
+ *         "b": "1.0.0"
+ *       }
+ *       ...
+ *     }
+ *   }
+ * ]
+ */
+```
+
+You can also return packages that are in the dependency tree on a particular package. This is very useful for getting all the packages required to build just a particular particular package in an optimal build order.
+
+```ts
+import { findMonoRepo, findPackages } from "@mono-repo/utils";
+
+const monoRepo = await findMonoRepo();
+const packages = await findPackages(monoRepo);
+
+console.log(packages);
+
+/**
+ * [
+ *   {
+ *     dir: "/absolute/path/to/package/a",
+ *     json: {
+ *       name: "a",
+ *       version: "1.0.0",
+ *       license: "MIT",
+ *       public: true,
+ *       dependencies: {
+ *         "b": "1.0.0"
+ *       }
+ *       ...
+ *     }
+ *   },
+ *   {
+ *     dir: "/absolute/path/to/package/b",
+ *     json: {
+ *       name: "b",
+ *       version: "1.0.0",
+ *       license: "MIT",
+ *       public: true,
+ *       ...
+ *     }
+ *   },
+ *   {
+ *     dir: "/absolute/path/to/package/c",
+ *     json: {
+ *       name: "c",
+ *       version: "1.0.0",
+ *       license: "MIT",
+ *       public: true,
+ *       dependencies: {
+ *         "a": "1.0.0"
+ *       }
+ *       ...
+ *     }
+ *   },
+ * ]
+ */
+
+const packageADependencies = await findPackages(monoRepo, {
+  order: "dependency-graph",
+  scope: packages[0],
+});
+
+console.log(packageADependencies);
 
 /**
  * [
