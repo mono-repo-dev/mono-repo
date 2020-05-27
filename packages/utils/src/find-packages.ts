@@ -5,10 +5,11 @@ import { MonoRepo, MonoRepoPackage, Package } from "./types";
 
 export interface FindPackagesOptions {
   order?: "alphabetical" | "dependency-graph";
+  scope?: MonoRepoPackage;
 }
 
 // Walks the dependency tree and returns packages in dependency order
-const getFlatPackageDependencies = (
+const getPackageDependencies = (
   currentPackage: MonoRepoPackage,
   monoRepoPackages: MonoRepoPackage[],
   resolvedPackages: MonoRepoPackage[] = [],
@@ -41,7 +42,7 @@ const getFlatPackageDependencies = (
     seenLocalPackages.push(currentPackage);
 
     // Complete walking the tree for this package dependency recursively
-    const nestedLocalPackages = getFlatPackageDependencies(
+    const nestedLocalPackages = getPackageDependencies(
       localPackage,
       monoRepoPackages,
       resolvedLocalPackages,
@@ -77,39 +78,6 @@ const getFlatPackageDependencies = (
   }, []);
 };
 
-// Sort packages by their dependency tree
-const orderByDependencyTree = async (
-  packages: MonoRepoPackage[]
-): Promise<MonoRepoPackage[]> => {
-  // Need to construct a root package that depends on
-  // all packages to act as the root of the tree
-  const rootPackage: MonoRepoPackage = {
-    dir: "",
-    json: {
-      name: "",
-      version: "1.0.0",
-      dependencies: packages.reduce(
-        (acc, next) => ({ ...acc, [next.json.name]: next.json.version }),
-        {}
-      ),
-    },
-  };
-
-  // Walk the dependency tree and then remove the root package as it doesn't really exist
-  return getFlatPackageDependencies(rootPackage, packages).filter(
-    (p) => p !== rootPackage
-  );
-};
-
-// Sort packages alphabetically by name
-const orderAlphabetically = async (
-  packages: MonoRepoPackage[]
-): Promise<MonoRepoPackage[]> => {
-  return packages.sort((a, b) =>
-    a.json.name.toLowerCase().localeCompare(b.json.name.toLowerCase())
-  );
-};
-
 export const findPackages = async (
   monoRepo: MonoRepo,
   options: FindPackagesOptions = { order: "alphabetical" }
@@ -143,14 +111,38 @@ export const findPackages = async (
     })
   );
 
+  // Need to construct a root package that depends on
+  // all packages to act as the root of the tree if one
+  // is not provided so we return all packages
+  const rootPackage = {
+    dir: "",
+    json: {
+      name: "",
+      version: "1.0.0",
+      dependencies: packages.reduce(
+        (acc, next) => ({ ...acc, [next.json.name]: next.json.version }),
+        {}
+      ),
+    },
+  };
+
+  // Obtain all packages in dependency-graph order by default
+  // as it will walk the tree for scoped packages
+  const packagesInDependencyGraphOrder = getPackageDependencies(
+    options.scope ?? rootPackage,
+    packages
+  ).filter((p) => p !== rootPackage && p !== options.scope);
+
   // Return packages sorted appropriately
   switch (options.order) {
     case "dependency-graph": {
-      return await orderByDependencyTree(packages);
+      return packagesInDependencyGraphOrder;
     }
     case "alphabetical":
     default: {
-      return await orderAlphabetically(packages);
+      return packagesInDependencyGraphOrder.sort((a, b) =>
+        a.json.name.toLowerCase().localeCompare(b.json.name.toLowerCase())
+      );
     }
   }
 };
