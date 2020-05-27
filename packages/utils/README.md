@@ -13,9 +13,7 @@
   <img style="display: inline-block; margin-right: 5px;" src="https://badgen.net/github/release/mono-repo-dev/mono-repo" />
 </p>
 
-Tools and libraries to aid in writing tools and libraries for managing mono repos.
-
-**Currently only supports Yarn Workspace mono repos.**
+Core util functions to aid writing tools and libraries for managing mono repos.
 
 ## Getting started
 
@@ -45,6 +43,8 @@ console.log(monoRepo);
  * }
  */
 ```
+
+**Currently only supports using Yarn Workspaces config.**
 
 ### `findPackages(monoRepo, { order: "alphabetical" | "dependency-graph", scope: package | undefined })`
 
