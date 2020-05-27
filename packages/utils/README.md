@@ -197,19 +197,6 @@ console.log(packageADependencies);
  *       ...
  *     }
  *   },
- *   {
- *     dir: "/absolute/path/to/package/a",
- *     json: {
- *       name: "a",
- *       version: "1.0.0",
- *       license: "MIT",
- *       public: true,
- *       dependencies: {
- *         "b": "1.0.0"
- *       }
- *       ...
- *     }
- *   }
  * ]
  */
 ```
