@@ -17,7 +17,10 @@ const getPackageDependencies = (
 ): MonoRepoPackage[] => {
   // Determine all the local packages that the current package depends on,
   // need to walk each of these all the way down the dependency tree
-  const localPackages = Object.keys(currentPackage.json?.dependencies ?? {})
+  const localPackages = [
+    ...Object.keys(currentPackage.json?.dependencies ?? {}),
+    ...Object.keys(currentPackage.json?.devDependencies ?? {}),
+  ]
     .filter((name) => monoRepoPackages.some((p) => p.json.name == name))
     .map((name) => monoRepoPackages.find((p) => p.json.name === name)!);
 

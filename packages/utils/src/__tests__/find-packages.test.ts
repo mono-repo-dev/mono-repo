@@ -49,7 +49,8 @@ describe("findPackages", () => {
     const pkgC = {
       name: "c",
       version: "1.0.0",
-      dependencies: { d: "1.0.0", f: "1.0.0" },
+      dependencies: { d: "1.0.0" },
+      devDependencies: { f: "1.0.0" },
     };
     const pkgD = {
       name: "d",
@@ -106,7 +107,11 @@ describe("findPackages", () => {
   it("should find all packages for a given scope (dependency-graph order)", async () => {
     const pkgA = { name: "a", version: "1.0.0", dependencies: { b: "1.0.0" } };
     const pkgB = { name: "b", version: "1.0.0", dependencies: { d: "1.0.0" } };
-    const pkgC = { name: "c", version: "1.0.0", dependencies: { a: "1.0.0" } };
+    const pkgC = {
+      name: "c",
+      version: "1.0.0",
+      devDependencies: { a: "1.0.0" },
+    };
     const pkgD = { name: "d", version: "1.0.0" };
     const monoRepoPkg = {
       private: true,
@@ -142,7 +147,11 @@ describe("findPackages", () => {
   });
 
   it("should find all packages for a given scope (alphabetical order)", async () => {
-    const pkgA = { name: "a", version: "1.0.0", dependencies: { d: "1.0.0" } };
+    const pkgA = {
+      name: "a",
+      version: "1.0.0",
+      devDependencies: { d: "1.0.0" },
+    };
     const pkgB = { name: "b", version: "1.0.0" };
     const pkgC = { name: "c", version: "1.0.0", dependencies: { a: "1.0.0" } };
     const pkgD = { name: "d", version: "1.0.0", dependencies: { b: "1.0.0" } };
