@@ -1,6 +1,6 @@
 {
   "name": "@mono-repo/utils",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Core util functions to aid writing tools and libraries for managing mono repos.",
   "license": "MIT",
   "main": "dist/main.cjs.js",

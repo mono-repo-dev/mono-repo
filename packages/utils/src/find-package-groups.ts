@@ -2,17 +2,17 @@ import type { MonoRepo, MonoRepoPackage } from "./types";
 import { findPackages } from "./find-packages";
 
 export interface FindGroupedPackagesOptions {
-  groupBy: "parallelize";
+  groupBy: "parallelizable";
 }
 
 export const findPackageGroups = async (
   monoRepo: MonoRepo,
   options: FindGroupedPackagesOptions = {
-    groupBy: "parallelize",
+    groupBy: "parallelizable",
   }
 ): Promise<MonoRepoPackage[][]> => {
   switch (options.groupBy) {
-    case "parallelize": {
+    case "parallelizable": {
       const packages = await findPackages(monoRepo, {
         order: "dependency-graph",
       });

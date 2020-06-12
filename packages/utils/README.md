@@ -200,3 +200,60 @@ console.log(packageADependencies);
  * ]
  */
 ```
+
+### `findPackageGroups(monoRepo, { groupBy: "parallelizable" })`
+
+Find packages within a mono repo and group them in groups that are safe to perform parallel tasks on such as building in dependency order efficiently.
+
+```ts
+import { findMonoRepo, findPackageGroups } from "@mono-repo/utils";
+
+const monoRepo = await findMonoRepo();
+const packageGroups = await findPackageGroups(monoRepo, {
+  order: "parallelizable",
+});
+
+console.log(packageGroups);
+
+/**
+ * [
+ *   [
+ *     {
+ *       dir: "/absolute/path/to/package/b",
+ *       json: {
+ *         name: "b",
+ *         version: "1.0.0",
+ *         license: "MIT",
+ *         public: true,
+ *         ...
+ *       }
+ *     },
+ *     {
+ *       dir: "/absolute/path/to/package/c",
+ *       json: {
+ *         name: "c",
+ *         version: "1.0.0",
+ *         license: "MIT",
+ *         public: true,
+ *         ...
+ *       }
+ *     }
+ *   ],
+ *   [
+ *     {
+ *       dir: "/absolute/path/to/package/a",
+ *       json: {
+ *         name: "a",
+ *         version: "1.0.0",
+ *         license: "MIT",
+ *         public: true,
+ *         dependencies: {
+ *           "b": "1.0.0"
+ *         }
+ *         ...
+ *       }
+ *     }
+ *   ]
+ * ]
+ */
+```
