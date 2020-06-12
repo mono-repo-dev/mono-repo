@@ -115,7 +115,7 @@ describe("findPackageGroups", () => {
   });
 
   it("should throw on unknown groupBy option", async () => {
-    expect(
+    await expect(
       // @ts-ignore - purposefully incorrect type
       findPackageGroups(await findMonoRepo(), { groupBy: "unknown" })
     ).rejects.toThrowError("Unknown groupBy option 'unknown'");
