@@ -1,0 +1,10 @@
+{
+  "name": "mono-repo-a",
+  "private": true,
+  "workspaces": [
+    "packages/**"
+  ],
+  "devDependencies": {
+    "@mono-repo/cli": "1.2.0"
+  }
+}

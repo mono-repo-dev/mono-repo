@@ -18,9 +18,9 @@ interface RunCommandOptions {
 
 export const run = async (options: RunCommandOptions) => {
   const monoRepo = await findMonoRepo();
-  const packages = (await findPackages(monoRepo)).filter(
-    (pkg) => pkg.json?.scripts?.[options.script]
-  );
+  const packages = (
+    await findPackages(monoRepo, { order: "dependency-graph" })
+  ).filter((pkg) => pkg.json?.scripts?.[options.script]);
   const packageGroups = (await findPackageGroups(monoRepo))
     .map((group) => group.filter((pkg) => pkg.json?.scripts?.[options.script]))
     .filter((group) => group.length > 0);
@@ -39,6 +39,14 @@ export const run = async (options: RunCommandOptions) => {
   const args = ["run", options.script, ...(options.args ?? [])];
 
   if (options.sync) {
+    console.log(
+      [
+        chalk.greenBright("Target packages (sync order):"),
+        ...packages.map((pkg) => pkg.json.name),
+        "",
+      ].join("\n")
+    );
+
     for (let pkg of packages) {
       try {
         await runCliCommand("yarn", args, {
@@ -51,6 +59,14 @@ export const run = async (options: RunCommandOptions) => {
       }
     }
   } else if (options.parallel) {
+    console.log(
+      [
+        chalk.greenBright("Target packages (parallel):"),
+        ...packages.map((pkg) => pkg.json.name),
+        "",
+      ].join("\n")
+    );
+
     const promises = packages.map((pkg) =>
       runCliCommand("yarn", args, {
         cwd: pkg.dir,
@@ -67,6 +83,18 @@ export const run = async (options: RunCommandOptions) => {
       }
     }
   } else {
+    console.log(
+      [
+        ...packageGroups.map((group, i) =>
+          [
+            chalk.greenBright(`Target packages (parallel batch ${i + 1})`),
+            ...group.map((pkg) => pkg.json.name),
+            "",
+          ].join("\n")
+        ),
+      ].join("\n")
+    );
+
     for (let group of packageGroups) {
       const promises = group.map((pkg) =>
         runCliCommand("yarn", args, {

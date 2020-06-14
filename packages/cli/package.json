@@ -24,7 +24,7 @@
     "typecheck": "ts-engine typecheck"
   },
   "devDependencies": {
-    "@ts-engine/cli": "^1.5.3",
+    "@ts-engine/cli": "^1.7.1",
     "jest-mock-console": "^1.0.1"
   },
   "dependencies": {
