@@ -1,32 +1,38 @@
 {
-  "name": "@mono-repo/utils",
+  "name": "@mono-repo/cli",
   "version": "1.2.0",
-  "description": "Core util functions to aid writing tools and libraries for managing mono repos.",
+  "description": "CLI tool for managing mono repos.",
   "repository": {
     "url": "https://github.com/mono-repo/mono-repo"
   },
   "license": "MIT",
-  "main": "dist/main.cjs.js",
-  "module": "dist/main.esm.js",
-  "types": "dist/main.d.ts",
-  "sideEffects": false,
   "keywords": [
     "monorepo",
     "mono",
-    "utils"
+    "cli",
+    "manage",
+    "packages"
   ],
+  "bin": {
+    "mono-repo": "./dist/main.js"
+  },
   "scripts": {
-    "build": "ts-engine build --library",
+    "build": "ts-engine build --node-app",
     "lint": "ts-engine lint",
+    "start": "ts-engine start",
     "test": "ts-engine test",
     "typecheck": "ts-engine typecheck --emit"
   },
   "devDependencies": {
     "@ts-engine/cli": "^1.5.3",
+    "jest-mock-console": "^1.0.1",
     "mock-fs": "^4.12.0"
   },
   "dependencies": {
+    "@mono-repo/utils": "1.2.0",
+    "@types/yargs": "^15.0.5",
     "fs-extra": "^9.0.0",
-    "glob-promise": "^3.4.0"
+    "glob-promise": "^3.4.0",
+    "yargs": "^15.3.1"
   }
 }
