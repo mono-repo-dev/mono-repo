@@ -25,15 +25,12 @@
   },
   "devDependencies": {
     "@ts-engine/cli": "^1.5.3",
-    "jest-mock-console": "^1.0.1",
-    "mock-fs": "^4.12.0"
+    "jest-mock-console": "^1.0.1"
   },
   "dependencies": {
     "@mono-repo/utils": "1.2.0",
     "@types/yargs": "^15.0.5",
     "chalk": "^4.1.0",
-    "fs-extra": "^9.0.0",
-    "glob-promise": "^3.4.0",
     "yargs": "^15.3.1"
   }
 }
