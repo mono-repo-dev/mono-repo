@@ -2,11 +2,14 @@
 
 import yargs from "yargs";
 import { handleFailure } from "./handle-failure";
-import { list, plan } from "./commands";
-import { options } from "./options";
+import { list, run } from "./commands";
+import { options, positionals } from "./options";
+import { checkSyncAndParallel } from "./checks";
+import { extractArgsOptionArgs } from "./middleware";
 
 yargs
   .scriptName("mono-repo")
+  .middleware(extractArgsOptionArgs)
   .fail(handleFailure)
   .command(
     "list",
@@ -19,13 +22,23 @@ yargs
     }
   )
   .command(
-    "plan",
-    "Display execution plan",
+    "run <script>",
+    "Execute scripts in packages",
     (yargs) => {
-      return yargs.options({ parallel: options.parallel });
+      return yargs
+        .options({
+          args: options.args,
+          bail: options.bail,
+          "no-bail": options["no-bail"],
+          parallel: options.parallel,
+          stream: options.stream,
+          sync: options.sync,
+        })
+        .positional("script", { ...positionals.script })
+        .check(checkSyncAndParallel);
     },
     async (argv) => {
       // @ts-ignore
-      await plan(argv);
+      await run(argv);
     }
   ).argv;

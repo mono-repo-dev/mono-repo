@@ -21,10 +21,10 @@ CLI tool for managing mono repos.
 
 ```sh
 mono-repo list
-mono-repo list --graph
 mono-repo run test --args --passWithNoTests
 mono-repo run test --parallel
-mono-repo run test --exit-code 0
+mono-repo run test --sync
+mono-repo run test --no-bail
 mono-repo plan test
 mono-repo plan test --parallel
 mono-repo add @tunstall/ui-core

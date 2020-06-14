@@ -32,7 +32,9 @@ describe("handleFailure", () => {
     const error = new Error("Oops!");
     handleFailure(undefined, error, argv);
 
-    expect(console.error).toHaveBeenCalledWith(chalk.redBright(error.stack));
+    expect(console.error).toHaveBeenCalledWith(
+      chalk.redBright(error.toString())
+    );
     expect(process.exit).toHaveBeenCalledTimes(1);
     expect(process.exit).toHaveBeenCalledWith(1);
   });
