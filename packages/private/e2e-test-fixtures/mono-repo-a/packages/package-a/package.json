@@ -1,5 +1,11 @@
 {
   "name": "package-a",
   "version": "1.2.0",
-  "private": true
+  "private": true,
+  "scripts": {
+    "echo": "sleep .1 && echo 'test-package-a'",
+    "echo-stream": "sleep .1 && echo 'test-package-a' && sleep 1 && echo 'test-package-a'",
+    "fail": "exit 1",
+    "echo-args": "echo "
+  }
 }

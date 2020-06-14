@@ -1,5 +1,13 @@
 {
   "name": "package-b",
   "version": "1.2.0",
-  "private": true
+  "private": true,
+  "scripts": {
+    "echo": "sleep .2 && echo 'test-package-b'",
+    "echo-stream": "sleep .2 && echo 'test-package-b' && sleep 1 && echo 'test-package-b'",
+    "echo-args": "echo "
+  },
+  "dependencies": {
+    "package-c": "1.2.0"
+  }
 }

@@ -18,12 +18,6 @@ interface RunCommandOptions {
 
 export const run = async (options: RunCommandOptions) => {
   const monoRepo = await findMonoRepo();
-  const packages = (
-    await findPackages(monoRepo, { order: "dependency-graph" })
-  ).filter((pkg) => pkg.json?.scripts?.[options.script]);
-  const packageGroups = (await findPackageGroups(monoRepo))
-    .map((group) => group.filter((pkg) => pkg.json?.scripts?.[options.script]))
-    .filter((group) => group.length > 0);
 
   const handleError = (errorOrCode: Error | number) => {
     const error =
@@ -39,9 +33,13 @@ export const run = async (options: RunCommandOptions) => {
   const args = ["run", options.script, ...(options.args ?? [])];
 
   if (options.sync) {
+    const packages = (
+      await findPackages(monoRepo, { order: "dependency-graph" })
+    ).filter((pkg) => pkg.json?.scripts?.[options.script]);
+
     console.log(
       [
-        chalk.greenBright("Target packages (sync order):"),
+        chalk.greenBright("Target packages (sync batch):"),
         ...packages.map((pkg) => pkg.json.name),
         "",
       ].join("\n")
@@ -59,9 +57,13 @@ export const run = async (options: RunCommandOptions) => {
       }
     }
   } else if (options.parallel) {
+    const packages = (
+      await findPackages(monoRepo, { order: "alphabetical" })
+    ).filter((pkg) => pkg.json?.scripts?.[options.script]);
+
     console.log(
       [
-        chalk.greenBright("Target packages (parallel):"),
+        chalk.greenBright("Target packages (parallel batch):"),
         ...packages.map((pkg) => pkg.json.name),
         "",
       ].join("\n")
@@ -83,11 +85,19 @@ export const run = async (options: RunCommandOptions) => {
       }
     }
   } else {
+    const packageGroups = (
+      await findPackageGroups(monoRepo, { groupBy: "parallelizable" })
+    )
+      .map((group) =>
+        group.filter((pkg) => pkg.json?.scripts?.[options.script])
+      )
+      .filter((group) => group.length > 0);
+
     console.log(
       [
         ...packageGroups.map((group, i) =>
           [
-            chalk.greenBright(`Target packages (parallel batch ${i + 1})`),
+            chalk.greenBright(`Target packages (parallel batch ${i + 1}):`),
             ...group.map((pkg) => pkg.json.name),
             "",
           ].join("\n")
