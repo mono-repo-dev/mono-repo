@@ -20,6 +20,17 @@ Tools and libraries to aid in writing tools and libraries for managing mono repo
 <table align="center">
   <tr>
     <td>
+      <a href="./packages/cli/README.md">@mono-repo/cli</a>
+    </td>
+    <td>CLI tool for managing mono repos.</td>
+    <td>
+      <a href="https://www.npmjs.com/package/@mono-repo/cli" rel="noopener noreferrer" target="_blank">
+        <img src="https://badgen.net/npm/v/@mono-repo/cli">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>
       <a href="./packages/utils/README.md">@mono-repo/utils</a>
     </td>
     <td>Core util functions to aid writing tools and libraries for managing mono repos.</td>

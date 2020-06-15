@@ -1,0 +1,10 @@
+{
+  "name": "package-c",
+  "version": "1.3.0",
+  "private": true,
+  "scripts": {
+    "echo": "sleep .3 && echo 'test-package-c'",
+    "echo-stream": "sleep .3 && echo 'test-package-c' && sleep 1 && echo 'test-package-c'",
+    "echo-args": "echo "
+  }
+}
