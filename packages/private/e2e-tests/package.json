@@ -3,7 +3,7 @@
   "version": "1.3.0",
   "private": true,
   "scripts": {
-    "pretest": "cd ../../cli && yarn build && mkdir -p ../private/e2e-test-fixtures/mono-repo-a/node_modules/.bin && cp ../../node_modules/.bin/mono-repo ../private/e2e-test-fixtures/mono-repo-a/node_modules/.bin/mono-repo",
+    "pretest": "cd ../../cli && yarn build",
     "test": "jest --runInBand"
   },
   "devDependencies": {
