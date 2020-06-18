@@ -1,5 +1,5 @@
 {
-  "name": "mono-repo-a",
+  "name": "mono-repo-with-scripts",
   "version": "1.3.0",
   "private": true,
   "workspaces": [

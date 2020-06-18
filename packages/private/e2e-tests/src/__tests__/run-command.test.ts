@@ -1,11 +1,18 @@
 import { runCliCommand } from "../run-cli-command";
-import { getWorkspaceDirectory } from "../get-workspace-directory";
+import { getMonoRepoTextFixtureDirectory } from "../get-mono-repo-test-fixture-directory";
 
 describe("run command", () => {
+  let monoRepoDir = "";
+
+  beforeAll(async () => {
+    monoRepoDir = await getMonoRepoTextFixtureDirectory(
+      "mono-repo-with-scripts"
+    );
+  });
+
   it("should run script in all packages in dependency order", async () => {
-    const workspaceDir = await getWorkspaceDirectory("mono-repo-a");
     const runner = runCliCommand("yarn run mono-repo run echo", {
-      cwd: workspaceDir,
+      cwd: monoRepoDir,
     });
 
     expect(await runner.waitForStatusCode()).toBe(0);
@@ -23,9 +30,8 @@ describe("run command", () => {
   });
 
   it("should run script in all packages in sync dependency order", async () => {
-    const workspaceDir = await getWorkspaceDirectory("mono-repo-a");
     const runner = runCliCommand("yarn run mono-repo run echo --sync", {
-      cwd: workspaceDir,
+      cwd: monoRepoDir,
     });
 
     expect(await runner.waitForStatusCode()).toBe(0);
@@ -42,9 +48,8 @@ describe("run command", () => {
   });
 
   it("should run script in all packages in parallel order", async () => {
-    const workspaceDir = await getWorkspaceDirectory("mono-repo-a");
     const runner = runCliCommand("yarn run mono-repo run echo --parallel", {
-      cwd: workspaceDir,
+      cwd: monoRepoDir,
     });
 
     expect(await runner.waitForStatusCode()).toBe(0);
@@ -61,11 +66,10 @@ describe("run command", () => {
   });
 
   it("should stream logs", async () => {
-    const workspaceDir = await getWorkspaceDirectory("mono-repo-a");
     const runner = runCliCommand(
       "yarn run mono-repo run echo-stream --parallel --stream",
       {
-        cwd: workspaceDir,
+        cwd: monoRepoDir,
       }
     );
 
@@ -86,29 +90,26 @@ describe("run command", () => {
   });
 
   it("should have exit code 1 if a script fails", async () => {
-    const workspaceDir = await getWorkspaceDirectory("mono-repo-a");
     const runner = runCliCommand("yarn run mono-repo run fail", {
-      cwd: workspaceDir,
+      cwd: monoRepoDir,
     });
 
     expect(await runner.waitForStatusCode()).toBe(1);
   });
 
   it("should have exit code 0 if a script fails when not bailing", async () => {
-    const workspaceDir = await getWorkspaceDirectory("mono-repo-a");
     const runner = runCliCommand("yarn run mono-repo run fail --no-bail", {
-      cwd: workspaceDir,
+      cwd: monoRepoDir,
     });
 
     expect(await runner.waitForStatusCode()).toBe(0);
   });
 
   it("should forward args", async () => {
-    const workspaceDir = await getWorkspaceDirectory("mono-repo-a");
     const runner = runCliCommand(
       "yarn run mono-repo run echo-args --sync --args hello",
       {
-        cwd: workspaceDir,
+        cwd: monoRepoDir,
       }
     );
 
