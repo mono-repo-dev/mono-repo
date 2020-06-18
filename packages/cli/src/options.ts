@@ -5,13 +5,7 @@ interface YargsOption {
   hidden?: boolean;
 }
 
-interface YargsPositional {
-  type?: "string" | "number" | "boolean";
-  describe: string;
-}
-
 const createOption = (option: YargsOption): YargsOption => option;
-const createPositional = (option: YargsPositional): YargsPositional => option;
 
 export const options = {
   args: createOption({
@@ -24,6 +18,11 @@ export const options = {
     hidden: true,
     type: "boolean",
   }),
+  dev: createOption({
+    describe: "Install dev dependency",
+    default: false,
+    type: "boolean",
+  }),
   "no-bail": createOption({
     describe: "Do not exit on script failures",
     default: false,
@@ -31,6 +30,11 @@ export const options = {
   }),
   parallel: createOption({
     describe: "Process all packages in parallel",
+    default: false,
+    type: "boolean",
+  }),
+  peer: createOption({
+    describe: "Install peer dependency",
     default: false,
     type: "boolean",
   }),
@@ -43,12 +47,5 @@ export const options = {
     describe: "Process all packages in sync",
     default: false,
     type: "boolean",
-  }),
-};
-
-export const positionals = {
-  script: createPositional({
-    describe: "Script to run",
-    type: "string",
   }),
 };

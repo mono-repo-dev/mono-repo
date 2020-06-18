@@ -22,7 +22,9 @@ const run = async () => {
   }
 
   const monoRepo = await findMonoRepo();
-  const packages = await findPackages(monoRepo);
+  const packages = await (await findPackages(monoRepo)).filter((p) =>
+    p.dir.includes("e2e-test-fixtures")
+  );
 
   // Update public package versions
   for (let pkg of packages) {
@@ -35,8 +37,10 @@ const run = async () => {
     // Update package version
     const packageJsonFilepath = path.join(pkg.dir, "package.json");
     const publicPkgJson = await fs.readJson(packageJsonFilepath);
-    publicPkgJson.version = options.version;
-    await fs.writeJson(packageJsonFilepath, publicPkgJson, { spaces: 2 });
+    if (publicPkgJson.workspaces === undefined) {
+      publicPkgJson.version = options.version;
+      await fs.writeJson(packageJsonFilepath, publicPkgJson, { spaces: 2 });
+    }
 
     // Update consumers versions of this dependency
     for (let consumerPkg of packages) {

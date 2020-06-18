@@ -2,8 +2,9 @@
 
 import yargs from "yargs";
 import { handleFailure } from "./handle-failure";
-import { list, run } from "./commands";
-import { options, positionals } from "./options";
+import { add, list, run } from "./commands";
+import { options } from "./options";
+import { positionals } from "./positionals";
 import { checkSyncAndParallel } from "./checks";
 import { extractArgsOptionArgs } from "./middleware";
 
@@ -11,6 +12,22 @@ yargs
   .scriptName("mono-repo")
   .middleware(extractArgsOptionArgs)
   .fail(handleFailure)
+  .command(
+    "add <package>",
+    "Add packages",
+    (yargs) => {
+      return yargs
+        .options({
+          dev: options.dev,
+          peer: options.peer,
+        })
+        .positional("package", { ...positionals.package });
+    },
+    async (argv) => {
+      // @ts-ignore
+      await add(argv);
+    }
+  )
   .command(
     "list",
     "List packages",
