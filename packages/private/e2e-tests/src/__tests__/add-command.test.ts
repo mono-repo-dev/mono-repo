@@ -7,6 +7,7 @@ import { getMonoRepoTextFixtureDirectory } from "../get-mono-repo-test-fixture-d
 describe("add command", () => {
   let monoRepoDir = "";
   let monoRepoNodeModulesDir = "";
+  let monoRepoYarnLockFilename = "";
   let higherMonoRepoDir = "";
   let packageDDir = "";
   let packageDJsonFilepath = "";
@@ -21,6 +22,7 @@ describe("add command", () => {
       "mono-repo-with-no-dependencies"
     );
     monoRepoNodeModulesDir = path.resolve(monoRepoDir, "node_modules");
+    monoRepoYarnLockFilename = path.resolve(monoRepoDir, "yarn.lock");
     higherMonoRepoDir = path.resolve(monoRepoDir, "..");
     packageDDir = path.resolve(monoRepoDir, "packages/package-d");
     packageDJsonFilepath = path.resolve(packageDDir, "package.json");
@@ -39,6 +41,7 @@ describe("add command", () => {
       spaces: 2,
     });
     await fs.remove(monoRepoNodeModulesDir);
+    await fs.remove(monoRepoYarnLockFilename);
     spawnSync("yarn", [], { cwd: higherMonoRepoDir });
   };
 
