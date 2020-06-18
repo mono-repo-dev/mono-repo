@@ -58,9 +58,14 @@ export const add = async (options: AddCommandOptions) => {
     const args = [
       "add",
       options.package,
-      options.dev && "--dev",
-      options.peer && "--peer",
-    ].filter(Boolean);
-    spawnSync("yarn", args, { cwd, encoding: "utf8" });
+      options.dev ? "--dev" : "",
+      options.peer ? "--peer" : "",
+    ].filter((s) => s.length > 0);
+    const r = spawnSync("yarn", args, {
+      cwd,
+      encoding: "utf8",
+    });
+    console.log(r.stderr);
+    console.log(r.stdout);
   }
 };

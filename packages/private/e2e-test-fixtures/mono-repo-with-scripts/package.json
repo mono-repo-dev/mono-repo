@@ -6,6 +6,6 @@
     "packages/**"
   ],
   "devDependencies": {
-    "@mono-repo/cli": "1.4.0"
+    "@mono-repo/cli": "^1.0.0"
   }
 }
