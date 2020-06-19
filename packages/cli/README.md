@@ -58,3 +58,23 @@ mono-repo run <script> --no-bail
 # Forward args onto all NPM scripts.
 mono-repo run <script> --args --forward --this --and --that
 ```
+
+### add
+
+Add a remote or local package to a package.
+
+**Note this only supports adding a single package at a time.**
+
+```sh
+# Add package
+mono-repo add <package>
+
+# Add package at version
+mono-repo add <package>@<version>
+
+# Add as dev dependency
+mono-repo add <package> --dev
+
+# Add as peer dependency
+mono-repo add <package> --peer
+```

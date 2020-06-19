@@ -2,6 +2,7 @@ import { spawnSync } from "child_process";
 import path from "path";
 import fs from "fs-extra";
 import { findMonoRepo, findPackages } from "@mono-repo/utils";
+import { orderPackageKeyValueMap } from "../order-package-key-value-map";
 
 interface AddCommandOptions {
   dev: boolean;
@@ -19,35 +20,57 @@ export const add = async (options: AddCommandOptions) => {
     throw new Error("Not in a package directory.");
   }
 
+  const isScoped = options.package.startsWith("@");
+  let isVersionSpecified = false;
   const packageParts = options.package.split("@");
-  const packageName = packageParts[0];
+  const packageName = `${isScoped ? "@" : ""}${packageParts[0]}${
+    packageParts[1] ?? ""
+  }`;
+
+  isVersionSpecified = isScoped
+    ? packageParts.length === 3
+    : packageParts.length === 2;
+
   const localPackage = packages.find((p) => p.json.name === packageName);
 
   if (localPackage) {
+    let packageVersion = isVersionSpecified
+      ? packageParts[packageParts.length - 1]
+      : `^${localPackage.json.version}`;
+
     const writePackageJson = targetPackage.json;
     if (options.dev) {
       if (!writePackageJson.devDependencies) {
         writePackageJson.devDependencies = {};
       }
 
-      writePackageJson.devDependencies[localPackage.json.name] =
-        localPackage.json.version;
+      writePackageJson.devDependencies[localPackage.json.name] = packageVersion;
+      writePackageJson.devDependencies = orderPackageKeyValueMap(
+        writePackageJson.devDependencies
+      );
     } else if (options.peer) {
       if (!writePackageJson.peerDependencies) {
         writePackageJson.peerDependencies = {};
       }
 
-      writePackageJson.peerDependencies[localPackage.json.name] =
-        localPackage.json.version;
+      writePackageJson.peerDependencies[
+        localPackage.json.name
+      ] = packageVersion;
+      writePackageJson.peerDependencies = orderPackageKeyValueMap(
+        writePackageJson.peerDependencies
+      );
     } else {
       if (!writePackageJson.dependencies) {
         writePackageJson.dependencies = {};
       }
 
-      writePackageJson.dependencies[localPackage.json.name] =
-        localPackage.json.version;
+      writePackageJson.dependencies[localPackage.json.name] = packageVersion;
+      writePackageJson.dependencies = orderPackageKeyValueMap(
+        writePackageJson.dependencies
+      );
     }
 
+    console.log(JSON.stringify(writePackageJson, null, 2));
     await fs.writeJSON(
       path.resolve(targetPackage.dir, "package.json"),
       writePackageJson,
