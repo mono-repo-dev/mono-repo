@@ -77,4 +77,7 @@ mono-repo add <package> --dev
 
 # Add as peer dependency
 mono-repo add <package> --peer
+
+# Add exact version
+mono-repo add <package> --exact
 ```

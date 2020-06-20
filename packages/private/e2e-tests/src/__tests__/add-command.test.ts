@@ -85,6 +85,20 @@ describe("add command", () => {
     expect(packageDJson.dependencies["is-odd"]).toBe(`^${isOddVersion}`);
   });
 
+  it("should add a remote dependency to the package with exact version", async () => {
+    const runner = runCliCommand("yarn run mono-repo add is-odd --exact", {
+      cwd: packageDDir,
+    });
+
+    expect(await runner.waitForStatusCode()).toBe(0);
+
+    const packageDJson = await fs.readJson(packageDJsonFilepath, {
+      encoding: "utf8",
+    });
+
+    expect(packageDJson.dependencies["is-odd"]).toBe(isOddVersion);
+  });
+
   it("should add a remote dependency to the package (scoped)", async () => {
     const runner = runCliCommand("yarn run mono-repo add @enzsft/npm-fixture", {
       cwd: packageDDir,
@@ -143,6 +157,20 @@ describe("add command", () => {
     expect(packageDJson.dependencies["package-e"]).toBe(
       `^${packageEJson.version}`
     );
+  });
+
+  it("should add a local dependency to the package with exact version", async () => {
+    const runner = runCliCommand("yarn run mono-repo add package-e --exact", {
+      cwd: packageDDir,
+    });
+
+    expect(await runner.waitForStatusCode()).toBe(0);
+
+    const packageDJson = await fs.readJson(packageDJsonFilepath, {
+      encoding: "utf8",
+    });
+
+    expect(packageDJson.dependencies["package-e"]).toBe(packageEJson.version);
   });
 
   it("should add a local dependency to the package (scoped)", async () => {

@@ -23,6 +23,11 @@ export const options = {
     default: false,
     type: "boolean",
   }),
+  exact: createOption({
+    describe: "Install dev dependency at exact version",
+    default: false,
+    type: "boolean",
+  }),
   "no-bail": createOption({
     describe: "Do not exit on script failures",
     default: false,

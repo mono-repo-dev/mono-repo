@@ -6,6 +6,7 @@ import { orderPackageKeyValueMap } from "../order-package-key-value-map";
 
 interface AddCommandOptions {
   dev: boolean;
+  exact: boolean;
   package: string;
   peer: boolean;
 }
@@ -36,7 +37,7 @@ export const add = async (options: AddCommandOptions) => {
   if (localPackage) {
     let packageVersion = isVersionSpecified
       ? packageParts[packageParts.length - 1]
-      : `^${localPackage.json.version}`;
+      : `${options.exact ? "" : "^"}${localPackage.json.version}`;
 
     const writePackageJson = targetPackage.json;
     if (options.dev) {
@@ -83,6 +84,7 @@ export const add = async (options: AddCommandOptions) => {
       options.package,
       options.dev ? "--dev" : "",
       options.peer ? "--peer" : "",
+      options.exact ? "--exact" : "",
     ].filter((s) => s.length > 0);
     const r = spawnSync("yarn", args, {
       cwd,

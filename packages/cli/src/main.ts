@@ -19,6 +19,7 @@ yargs
       return yargs
         .options({
           dev: options.dev,
+          exact: options.exact,
           peer: options.peer,
         })
         .positional("package", { ...positionals.package });
