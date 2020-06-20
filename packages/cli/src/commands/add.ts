@@ -71,13 +71,16 @@ export const add = async (options: AddCommandOptions) => {
       );
     }
 
-    console.log(JSON.stringify(writePackageJson, null, 2));
     await fs.writeJSON(
       path.resolve(targetPackage.dir, "package.json"),
       writePackageJson,
       { encoding: "utf8", spaces: 2 }
     );
-    spawnSync("yarn", [], { cwd, encoding: "utf8" });
+    spawnSync("yarn", [], {
+      cwd,
+      encoding: "utf8",
+      stdio: "inherit",
+    });
   } else {
     const args = [
       "add",
@@ -86,11 +89,10 @@ export const add = async (options: AddCommandOptions) => {
       options.peer ? "--peer" : "",
       options.exact ? "--exact" : "",
     ].filter((s) => s.length > 0);
-    const r = spawnSync("yarn", args, {
+    spawnSync("yarn", args, {
       cwd,
       encoding: "utf8",
+      stdio: "inherit",
     });
-    console.log(r.stderr);
-    console.log(r.stdout);
   }
 };

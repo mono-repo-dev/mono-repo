@@ -28,46 +28,51 @@ const run = async () => {
 
   // Update public package versions
   for (let pkg of packages) {
-    const pkgNameVersion = chalk.greenBright(
-      `${pkg.json.name}@${pkg.json.version}`
-    );
-    const pkgNewVersion = chalk.yellowBright(options.version);
-    console.log(`${pkgNameVersion} ⮕  ${pkgNewVersion}...`);
-
-    // Update package version
-    const packageJsonFilepath = path.join(pkg.dir, "package.json");
-    const publicPkgJson = await fs.readJson(packageJsonFilepath);
-    if (publicPkgJson.workspaces === undefined) {
-      publicPkgJson.version = options.version;
-      await fs.writeJson(packageJsonFilepath, publicPkgJson, { spaces: 2 });
-    }
-
-    // Update consumers versions of this dependency
-    for (let consumerPkg of packages) {
-      const consumerPackageJsonFilepath = path.join(
-        consumerPkg.dir,
-        "package.json"
+    if (
+      pkg.json.name !== "mono-repo-with-scripts" &&
+      pkg.json.name !== "mono-repo-with-no-dependencies"
+    ) {
+      const pkgNameVersion = chalk.greenBright(
+        `${pkg.json.name}@${pkg.json.version}`
       );
+      const pkgNewVersion = chalk.yellowBright(options.version);
+      console.log(`${pkgNameVersion} ⮕  ${pkgNewVersion}...`);
 
-      const consumerPkgJson = await fs.readJson(consumerPackageJsonFilepath);
-
-      if (
-        consumerPkgJson.dependencies &&
-        consumerPkgJson.dependencies[pkg.json.name]
-      ) {
-        consumerPkgJson.dependencies[pkg.json.name] = options.version;
+      // Update package version
+      const packageJsonFilepath = path.join(pkg.dir, "package.json");
+      const publicPkgJson = await fs.readJson(packageJsonFilepath);
+      if (publicPkgJson.workspaces === undefined) {
+        publicPkgJson.version = options.version;
+        await fs.writeJson(packageJsonFilepath, publicPkgJson, { spaces: 2 });
       }
 
-      if (
-        consumerPkgJson.devDependencies &&
-        consumerPkgJson.devDependencies[pkg.json.name]
-      ) {
-        consumerPkgJson.devDependencies[pkg.json.name] = options.version;
-      }
+      // Update consumers versions of this dependency
+      for (let consumerPkg of packages) {
+        const consumerPackageJsonFilepath = path.join(
+          consumerPkg.dir,
+          "package.json"
+        );
 
-      await fs.writeJson(consumerPackageJsonFilepath, consumerPkgJson, {
-        spaces: 2,
-      });
+        const consumerPkgJson = await fs.readJson(consumerPackageJsonFilepath);
+
+        if (
+          consumerPkgJson.dependencies &&
+          consumerPkgJson.dependencies[pkg.json.name]
+        ) {
+          consumerPkgJson.dependencies[pkg.json.name] = options.version;
+        }
+
+        if (
+          consumerPkgJson.devDependencies &&
+          consumerPkgJson.devDependencies[pkg.json.name]
+        ) {
+          consumerPkgJson.devDependencies[pkg.json.name] = options.version;
+        }
+
+        await fs.writeJson(consumerPackageJsonFilepath, consumerPkgJson, {
+          spaces: 2,
+        });
+      }
     }
   }
 };
