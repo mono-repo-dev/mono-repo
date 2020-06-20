@@ -3,7 +3,7 @@ import type { PackageKeyValueMap } from "@mono-repo/utils";
 export const orderPackageKeyValueMap = (
   map: PackageKeyValueMap<string>
 ): PackageKeyValueMap<string> => {
-  const orderedObject = {};
+  const orderedObject: PackageKeyValueMap<string> = {};
   Object.keys(map)
     .sort()
     .forEach((key) => {
