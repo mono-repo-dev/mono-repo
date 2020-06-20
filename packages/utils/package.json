@@ -1,6 +1,6 @@
 {
   "name": "@mono-repo/utils",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Core util functions to aid writing tools and libraries for managing mono repos.",
   "repository": {
     "url": "https://github.com/mono-repo/mono-repo"

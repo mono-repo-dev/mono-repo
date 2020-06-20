@@ -1,6 +1,6 @@
 {
   "name": "package-c",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "private": true,
   "scripts": {
     "echo": "sleep .3 && echo 'test-package-c'",
