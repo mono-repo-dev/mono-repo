@@ -5,6 +5,15 @@ export interface FindGroupedPackagesOptions {
   groupBy: "parallelizable";
 }
 
+const getDependencies = (pkg: MonoRepoPackage): string[] => {
+  const dependencies = [
+    ...Object.keys(pkg.json.dependencies ?? {}),
+    ...Object.keys(pkg.json.devDependencies ?? {}),
+  ];
+
+  return dependencies;
+};
+
 export const findPackageGroups = async (
   monoRepo: MonoRepo,
   options: FindGroupedPackagesOptions = {
@@ -16,24 +25,34 @@ export const findPackageGroups = async (
       const packages = await findPackages(monoRepo, {
         order: "dependency-graph",
       });
-      const groups: MonoRepoPackage[][] = [];
-      let currentGroup: MonoRepoPackage[] = [];
+      const groups: MonoRepoPackage[][] = [[]];
 
-      for (let pkg of packages) {
-        const dependencies = [
-          ...Object.keys(pkg.json.dependencies ?? {}),
-          ...Object.keys(pkg.json.devDependencies ?? {}),
-        ];
+      for (let currentPackage of packages) {
+        let previousGroup = null;
+        let pushed = false;
+        for (let currentGroup of groups.slice().reverse()) {
+          if (
+            currentGroup.find((p) =>
+              getDependencies(currentPackage).includes(p.json.name)
+            )
+          ) {
+            if (previousGroup) {
+              previousGroup.push(currentPackage);
+            } else {
+              groups.push([currentPackage]);
+            }
 
-        if (currentGroup.find((p) => dependencies.includes(p.json.name))) {
-          groups.push(currentGroup);
-          currentGroup = [];
+            pushed = true;
+            break;
+          }
+
+          previousGroup = currentGroup;
         }
 
-        currentGroup.push(pkg);
+        if (!pushed) {
+          groups[0].push(currentPackage);
+        }
       }
-
-      groups.push(currentGroup);
 
       return groups;
     }
