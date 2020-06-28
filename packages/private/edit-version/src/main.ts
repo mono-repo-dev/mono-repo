@@ -22,7 +22,11 @@ const run = async () => {
   }
 
   const monoRepo = await findMonoRepo();
-  const packages = await await findPackages(monoRepo);
+  const packages = (await findPackages(monoRepo)).filter(
+    (p) =>
+      p.json.name !== "mono-repo-with-no-dependencies" &&
+      p.json.name !== "mono-repo-with-scripts"
+  );
 
   // Update public package versions
   for (let pkg of packages) {
