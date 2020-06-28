@@ -1,13 +1,13 @@
 {
   "name": "@mono-repo/e2e-tests",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "private": true,
   "scripts": {
     "pretest": "cd ../../cli && yarn build",
     "test": "jest --runInBand"
   },
   "devDependencies": {
-    "@mono-repo/utils": "1.4.1",
+    "@mono-repo/utils": "1.4.2",
     "@types/fs-extra": "^9.0.1",
     "fs-extra": "^9.0.1",
     "jest": "^26.0.1",

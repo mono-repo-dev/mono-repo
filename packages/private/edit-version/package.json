@@ -1,6 +1,6 @@
 {
   "name": "@mono-repo/edit-version",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "private": true,
   "scripts": {
     "build": "ts-engine build --node-app",
@@ -10,10 +10,11 @@
     "typecheck": "ts-engine typecheck"
   },
   "devDependencies": {
-    "@ts-engine/cli": "^1.7.1"
+    "@ts-engine/cli": "^1.7.1",
+    "@types/minimist": "^1.2.0"
   },
   "dependencies": {
-    "@mono-repo/utils": "1.4.1",
+    "@mono-repo/utils": "1.4.2",
     "@types/semver": "^7.1.0",
     "chalk": "^4.0.0",
     "fs-extra": "^9.0.0",

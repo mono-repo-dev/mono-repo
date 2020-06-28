@@ -22,9 +22,7 @@ const run = async () => {
   }
 
   const monoRepo = await findMonoRepo();
-  const packages = await (await findPackages(monoRepo)).filter((p) =>
-    p.dir.includes("e2e-test-fixtures")
-  );
+  const packages = await await findPackages(monoRepo);
 
   // Update public package versions
   for (let pkg of packages) {
