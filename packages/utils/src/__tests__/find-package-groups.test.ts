@@ -7,7 +7,7 @@ describe("findPackageGroups", () => {
     mockFs.restore();
   });
 
-  it("should find all packages in the mono repo without duplicates (grouped by dependendant-parallel-order)", async () => {
+  it("should find all packages in the mono repo without duplicates (grouped by parallelizable)", async () => {
     const pkgA = {
       name: "a",
       version: "1.0.0",
@@ -74,6 +74,43 @@ describe("findPackageGroups", () => {
           dir: "/packages/a",
           json: pkgA,
         },
+      ],
+    ]);
+  });
+
+  it("should find all packages in the mono repo without duplicates efficiently (grouped by parallelizable)", async () => {
+    const pkgA = { name: "a", version: "1.0.0", dependencies: {} };
+    const pkgB = { name: "b", version: "1.0.0", dependencies: {} };
+    const pkgC = { name: "c", version: "1.0.0", dependencies: {} };
+    const pkgD = { name: "d", version: "1.0.0", dependencies: { c: "1.0.0" } };
+    const pkgE = { name: "e", version: "1.0.0", dependencies: {} };
+    const pkgF = { name: "f", version: "1.0.0", dependencies: { e: "1.0.0" } };
+    const monoRepoPkg = {
+      private: true,
+      workspaces: ["packages/**"],
+    };
+
+    mockFs({
+      "/package.json": JSON.stringify(monoRepoPkg),
+      "/packages/a/package.json": JSON.stringify(pkgA),
+      "/packages/b/package.json": JSON.stringify(pkgB),
+      "/packages/c/package.json": JSON.stringify(pkgC),
+      "/packages/d/package.json": JSON.stringify(pkgD),
+      "/packages/e/package.json": JSON.stringify(pkgE),
+      "/packages/f/package.json": JSON.stringify(pkgF),
+    });
+
+    const packageGroups = await findPackageGroups(await findMonoRepo());
+    expect(packageGroups).toEqual([
+      [
+        { dir: "/packages/a", json: pkgA },
+        { dir: "/packages/b", json: pkgB },
+        { dir: "/packages/c", json: pkgC },
+        { dir: "/packages/e", json: pkgE },
+      ],
+      [
+        { dir: "/packages/d", json: pkgD },
+        { dir: "/packages/f", json: pkgF },
       ],
     ]);
   });
