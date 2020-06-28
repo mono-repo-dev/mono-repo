@@ -1,6 +1,6 @@
 {
   "name": "package-b",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "private": true,
   "scripts": {
     "echo": "sleep .2 && echo 'test-package-b'",
@@ -8,6 +8,6 @@
     "echo-args": "echo "
   },
   "dependencies": {
-    "package-c": "1.4.1"
+    "package-c": "1.4.2"
   }
 }

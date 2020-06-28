@@ -15,7 +15,7 @@
   <img style="display: inline-block; margin-right: 5px;" src="https://badgen.net/github/release/mono-repo-dev/mono-repo" />
 </p>
 
-CLI tool for managing mono repos.
+CLI tool for managing mono repos powered by Yarn Workspaces.
 
 ## Commands
 
