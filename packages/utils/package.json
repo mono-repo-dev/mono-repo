@@ -1,6 +1,6 @@
 {
   "name": "@mono-repo/utils",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Core util functions to aid writing tools and libraries for managing mono repos.",
   "repository": {
     "url": "https://github.com/mono-repo/mono-repo"
@@ -22,7 +22,7 @@
     "typecheck": "ts-engine typecheck --emit"
   },
   "devDependencies": {
-    "@ts-engine/cli": "^1.7.1",
+    "@ts-engine/cli": "^1.11.0",
     "mock-fs": "^4.12.0"
   },
   "dependencies": {
