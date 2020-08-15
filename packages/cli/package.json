@@ -1,6 +1,6 @@
 {
   "name": "@mono-repo/cli",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "CLI tool for managing mono repos.",
   "repository": {
     "url": "https://github.com/mono-repo/mono-repo"
@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@ts-engine/runtime": "^1.11.0",
-    "@mono-repo/utils": "1.4.3",
+    "@mono-repo/utils": "1.4.4",
     "@types/yargs": "^15.0.5",
     "chalk": "^4.1.0",
     "yargs": "^15.3.1"
