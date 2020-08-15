@@ -71,7 +71,7 @@ describe("add command", () => {
     ]);
   });
 
-  it.only("should add a remote dependency to the package", async () => {
+  it("should add a remote dependency to the package", async () => {
     const runner = runCliCommand("yarn run mono-repo add is-odd", {
       cwd: packageDDir,
     });
