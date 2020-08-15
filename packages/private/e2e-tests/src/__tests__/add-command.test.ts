@@ -6,9 +6,7 @@ import { getMonoRepoTextFixtureDirectory } from "../get-mono-repo-test-fixture-d
 import { getNpmVersion } from "../get-npm-version";
 
 describe("add command", () => {
-  let monoRepoDir = "";
-  let monoRepoNodeModulesDir = "";
-  let monoRepoYarnLockFilename = "";
+  let packageCollectionDir = "";
   let higherMonoRepoDir = "";
   let packageDDir = "";
   let packageDJsonFilepath = "";
@@ -23,19 +21,17 @@ describe("add command", () => {
   let enzsftNpmFixtureVersion = "";
 
   beforeAll(async () => {
-    monoRepoDir = await getMonoRepoTextFixtureDirectory(
-      "mono-repo-with-no-dependencies"
+    packageCollectionDir = await getMonoRepoTextFixtureDirectory(
+      "packages-to-add-dependencies-to"
     );
-    monoRepoNodeModulesDir = path.resolve(monoRepoDir, "node_modules");
-    monoRepoYarnLockFilename = path.resolve(monoRepoDir, "yarn.lock");
-    higherMonoRepoDir = path.resolve(monoRepoDir, "..");
-    packageDDir = path.resolve(monoRepoDir, "packages/package-d");
+    higherMonoRepoDir = path.resolve(packageCollectionDir, "..");
+    packageDDir = path.resolve(packageCollectionDir, "packages/package-d");
     packageDJsonFilepath = path.resolve(packageDDir, "package.json");
     packageDJson = await fs.readJSON(packageDJsonFilepath);
-    packageEDir = path.resolve(monoRepoDir, "packages/package-e");
+    packageEDir = path.resolve(packageCollectionDir, "packages/package-e");
     packageEJsonFilepath = path.resolve(packageEDir, "package.json");
     packageEJson = await fs.readJSON(packageEJsonFilepath);
-    packageFDir = path.resolve(monoRepoDir, "packages/package-f");
+    packageFDir = path.resolve(packageCollectionDir, "packages/package-f");
     packageFJsonFilepath = path.resolve(packageFDir, "package.json");
     packageFJson = await fs.readJSON(packageFJsonFilepath);
     isOddVersion = getNpmVersion("is-odd");
@@ -47,8 +43,14 @@ describe("add command", () => {
       encoding: "utf8",
       spaces: 2,
     });
-    await fs.remove(monoRepoNodeModulesDir);
-    await fs.remove(monoRepoYarnLockFilename);
+    await fs.writeJSON(packageEJsonFilepath, packageEJson, {
+      encoding: "utf8",
+      spaces: 2,
+    });
+    await fs.writeJSON(packageFJsonFilepath, packageFJson, {
+      encoding: "utf8",
+      spaces: 2,
+    });
     spawnSync("yarn", [], { cwd: higherMonoRepoDir });
   };
 
@@ -61,8 +63,11 @@ describe("add command", () => {
   });
 
   it("should inform the user they are not in a package directory", async () => {
+    const altMonoRepoDir = await getMonoRepoTextFixtureDirectory(
+      "mono-repo-with-scripts"
+    );
     const runner = runCliCommand("yarn run mono-repo add is-odd", {
-      cwd: monoRepoDir,
+      cwd: altMonoRepoDir,
     });
     const statusCode = await runner.waitForStatusCode();
     expect(statusCode).toBe(1);
